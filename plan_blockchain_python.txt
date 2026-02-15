@@ -1,0 +1,68 @@
+[CONTEXTE POUR L'IA]
+Ceci est notre plan d'action de référence détaillé pour construire une blockchain en Python "from scratch" (Option A : Proof of Work, réseau P2P via API HTTP). 
+L'utilisateur connaît bien la théorie de la blockchain et maîtrise les bases de Python (n'est pas débutant). L'objectif est de suivre ce plan étape par étape en liant l'implémentation à la théorie.
+
+[PHASE 1 : PRÉREQUIS PYTHON]
+- hashlib : Cryptographie et génération de hash SHA-256.
+- json : Sérialisation de données (avec tri des clés) pour garantir un hachage déterministe.
+- Flask ou FastAPI : Création de l'API web pour exposer le nœud au réseau.
+- requests / httpx : Communication HTTP entre les nœuds.
+- time : Horodatage (timestamp) précis des blocs.
+
+[PHASE 2 : PLAN D'ACTION DÉTAILLÉ ET RÔLE THÉORIQUE]
+
+
+Étape 1 : Modéliser le Bloc et la Chaîne
+- Créer la classe `Blockchain`.
+- Initialiser `self.chain = []` et `self.current_transactions = []`.
+- Créer la méthode `new_block(proof, previous_hash)`.
+- Générer le "Bloc Genesis" dans le constructeur.
+-> RÔLE DANS LA BLOCKCHAIN : Le bloc est le conteneur de données fondamental. La chaîne garantit l'ordre chronologique de l'historique. Le "Bloc Genesis" est l'ancre de confiance codée en dur à partir de laquelle tout le réseau démarre.
+
+
+Étape 2 : Implémenter la logique cryptographique
+- Créer une méthode statique `hash(block)`.
+- Convertir le dictionnaire en chaîne JSON avec tri des clés.
+- Appliquer `hashlib.sha256()`.
+-> RÔLE DANS LA BLOCKCHAIN : Le hash agit comme une empreinte digitale unique pour un bloc. En incluant le hash du bloc précédent dans le nouveau bloc, on crée une chaîne mathématique incassable. Si un attaquant modifie une seule transaction d'un ancien bloc, son hash change, ce qui invalide automatiquement tous les blocs suivants.
+
+Étape 3 : Gérer les transactions
+- Créer la méthode `new_transaction(sender, recipient, amount)`.
+- Ajouter la transaction à `self.current_transactions`.
+- Retourner l'index du prochain bloc.
+-> RÔLE DANS LA BLOCKCHAIN : Les transactions représentent la valeur transférée. La liste `current_transactions` agit comme la "Mempool" (Memory Pool) : une salle d'attente où les transactions patientent jusqu'à ce qu'un mineur les valide et les scelle définitivement dans le prochain bloc.
+
+
+Étape 4 : Coder la Preuve de Travail (Proof of Work)
+- Créer `proof_of_work(last_proof)`.
+- Créer la méthode statique `valid_proof(last_proof, proof)` pour vérifier la présence des zéros (ex: "0000").
+-> RÔLE DANS LA BLOCKCHAIN : Le PoW dissuade le spam et empêche la falsification de l'historique. Il force les mineurs à dépenser de l'énergie (puissance de calcul) pour avoir le droit d'ajouter un bloc. Cela rend la réécriture de la chaîne par un acteur malveillant économiquement et technologiquement irréalisable.
+
+Étape 5 : Exposer la Blockchain via une API Web
+- Instancier le nœud avec Flask/FastAPI.
+- Créer les routes `GET /chain`, `POST /transactions/new`, et `GET /mine`.
+-> RÔLE DANS LA BLOCKCHAIN : Une blockchain n'a pas d'interface graphique centralisée, c'est un réseau de serveurs. L'API permet aux utilisateurs d'envoyer de nouvelles transactions au nœud, et au nœud de s'auto-récompenser en créant de la monnaie lors du minage (coinbase transaction).
+
+
+Étape 6 : Décentralisation et Consensus
+- Ajouter `self.nodes = set()` pour stocker les URL des voisins.
+- Créer les méthodes `register_node(address)`, `valid_chain(chain)`, et `resolve_conflicts()`.
+- Créer les routes `/nodes/register` et `/nodes/resolve`.
+-> RÔLE DANS LA BLOCKCHAIN : C'est le cœur de la décentralisation. Puisqu'il n'y a pas de chef, les nœuds doivent se mettre d'accord sur la version de la vérité. L'algorithme de consensus (ici, la "règle de la chaîne la plus longue") permet de résoudre les conflits (les forks) en garantissant que tous les nœuds honnêtes finissent par adopter la même chaîne valide.
+
+[CHECKLIST FINALE DES POINTS À VALIDER]
+- [ ] Imports (hashlib, json, time, requests).
+- [ ] Classe `Blockchain` initialisée.
+- [ ] Bloc Genesis automatisé.
+- [ ] Structure du bloc.
+- [ ] Méthode `hash(block)` avec tri JSON.
+- [ ] Méthode `new_transaction()`.
+- [ ] Méthode `new_block()`.
+- [ ] Méthode `proof_of_work()`.
+- [ ] Méthode `valid_proof()`.
+- [ ] Set() pour adresses des nœuds.
+- [ ] Méthode `register_node()`.
+- [ ] Méthode `valid_chain()`.
+- [ ] Méthode `resolve_conflicts()` (consensus).
+- [ ] Serveur web Flask/FastAPI.
+- [ ] Routes API : /mine, /chain, /transactions/new, /nodes/register, /nodes/resolve.
